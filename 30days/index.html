@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>30日実践講座</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,700&display=swap">
+<style>
+/* Layout: 講座の拠点ページ。上に進み具合とお知らせ、その下に5章×6日の目次。公開済みのDAYは色づき、準備中は淡く待機している */
+:root{
+  --bg:#F8F6FB;--paper:#FFFFFF;--ink:#2B2633;--muted:#6E6679;--line:#E4DEEC;
+  --c1:#2E9E8F;--c1-soft:#DDF2EE;   /* 第1章 若竹 */
+  --c2:#E3A21A;--c2-soft:#FBEFD2;   /* 第2章 山吹 */
+  --c3:#E0577A;--c3-soft:#FBE3EA;   /* 第3章 紅梅 */
+  --c4:#4A4FA8;--c4-soft:#E5E6F7;   /* 第4章 藍 */
+  --c5:#6B4FB8;--c5-soft:#ECE6F8;   /* 第5章 紫 */
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-latin:"Fraunces",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17141D;--paper:#211D29;--ink:#EEEAF4;--muted:#A79FB3;--line:#352F40;
+  --c1:#4FC2B2;--c1-soft:#1C3532;--c2:#F0BA45;--c2-soft:#3A2F17;--c3:#F07A98;--c3-soft:#3C2129;--c4:#8F94F0;--c4-soft:#25264A;--c5:#A88EF0;--c5-soft:#2B2440;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17141D;--paper:#211D29;--ink:#EEEAF4;--muted:#A79FB3;--line:#352F40;
+  --c1:#4FC2B2;--c1-soft:#1C3532;--c2:#F0BA45;--c2-soft:#3A2F17;--c3:#F07A98;--c3-soft:#3C2129;--c4:#8F94F0;--c4-soft:#25264A;--c5:#A88EF0;--c5-soft:#2B2440;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.45;margin:0}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--c5);outline-offset:2px}
+
+/* Hero */
+.hero{padding-block:52px 28px}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--muted);font-weight:700}
+.hero h1{font-size:clamp(28px,6vw,42px);font-weight:800;margin-top:10px}
+.hero h1 .num{font-family:var(--f-latin);font-style:italic;font-weight:700;font-size:1.25em;color:var(--c5);margin-right:.08em}
+.lead{margin-top:16px;color:var(--muted);max-width:36em;display:grid;gap:10px}
+.strip{margin-top:26px;display:grid;grid-template-columns:repeat(30,1fr);gap:3px;max-width:560px}
+.strip i{height:14px;border-radius:3px;background:var(--line);transition:background .4s}
+.strip i.open{opacity:1}
+.strip i.done{outline:2px solid var(--ink);outline-offset:-2px}
+
+/* Status row */
+.status{padding-block:8px 8px}
+.status-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:14px}
+.panel{min-width:0;background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.panel h2{font-family:var(--f-body);font-size:13px;letter-spacing:.12em;font-weight:700;color:var(--muted)}
+.progress-num{margin-top:6px;display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums}
+.progress-num b{font-family:var(--f-latin);font-style:italic;font-size:44px;line-height:1;color:var(--c5)}
+.progress-num span{color:var(--muted);font-size:14px}
+.bar{margin-top:12px;height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--c5);transition:width .5s}
+.panel .small{font-size:13px;color:var(--muted);margin-top:8px}
+.next{margin-top:12px;display:block;text-decoration:none;font-weight:700;font-size:15px;padding:10px 14px;border-radius:12px;background:var(--c5-soft);color:var(--ink)}
+.next small{display:block;font-size:12px;color:var(--muted);font-weight:500}
+.news{margin-top:10px;display:grid;gap:10px;list-style:none;padding:0}
+.news li{display:grid;grid-template-columns:auto 1fr;gap:12px;font-size:15px;align-items:baseline}
+.news time{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.news .new{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--c3);border-radius:999px;padding:0 8px;margin-right:6px;vertical-align:2px}
+.promise{margin-top:14px;font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+
+/* How */
+.how{padding-block:28px 4px}
+.how ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.how li{font-size:14px;color:var(--muted);border-top:2px solid var(--line);padding-top:10px}
+.how b{display:block;color:var(--ink);font-size:15px}
+
+/* Chapters */
+.chapter{padding-block:36px}
+.chapter + .chapter{border-top:1px dashed var(--line)}
+.ch-head{display:flex;gap:14px;align-items:flex-start}
+.ch-no{flex:none;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;color:#fff;font-family:var(--f-latin);font-style:italic;font-weight:700;font-size:22px;background:var(--cc)}
+.ch-head p{font-size:12px;letter-spacing:.14em;font-weight:700;color:var(--cc)}
+.ch-head h2{font-size:clamp(19px,3.8vw,24px);font-weight:800}
+.ch-desc{margin-top:10px;color:var(--muted);font-size:15px;max-width:36em}
+.days{margin-top:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.day{min-width:0;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--paper);text-decoration:none;color:var(--ink)}
+.day .dn{font-family:var(--f-latin);font-style:italic;font-weight:700;font-size:13px;color:var(--muted);text-align:center;line-height:1.1;min-width:2.6em}
+.day .dn b{display:block;font-size:22px;color:var(--ink)}
+.day .tt{min-width:0}
+.day .tt strong{display:block;font-size:15px;line-height:1.55}
+.day .tt span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.day.open{border-color:color-mix(in srgb,var(--cc) 55%,var(--line))}
+.day.open .dn b{color:var(--cc)}
+.day.open:hover{background:var(--cs)}
+.day.soon{background:transparent;border-style:dashed;color:var(--muted)}
+.day.soon .dn b{color:var(--muted);opacity:.6}
+.day .state{font-size:11px;font-weight:700;white-space:nowrap;border-radius:999px;padding:2px 10px}
+.day.open .state{background:var(--cc);color:#fff}
+.day.soon .state{background:var(--line);color:var(--muted)}
+.day.done .state{background:var(--ink);color:var(--paper)}
+.mark{margin-top:6px}
+.mark label{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);cursor:pointer}
+.mark input{accent-color:var(--cc);width:16px;height:16px}
+.daywrap{min-width:0;display:grid}
+
+footer{padding-block:32px 44px;font-size:12px;color:var(--muted);text-align:center;display:grid;gap:6px}
+
+@media (max-width:640px){
+  .hero{padding-block:34px 18px}
+  .status-grid{grid-template-columns:1fr}
+  .how ol{grid-template-columns:1fr}
+  .days{grid-template-columns:1fr}
+  .strip{gap:2px}
+  .strip i{height:12px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">ワークで進める コンテンツ販売の実践講座</p>
+    <h1><span class="num">30</span>日で、売れるコンテンツの土台をつくる</h1>
+    <div class="lead">
+      <p>1日1つ、読んで、ワークに取り組んでいって、その先に、あなただけの商品を世に出すところまで一緒に進んでいく講座です。</p>
+      <p>中身はこれからも随時追加していくので、更新を楽しみにしていてくださいね。</p>
+    </div>
+    <div class="strip" id="strip" aria-hidden="true"></div>
+  </div>
+</header>
+
+<section class="status">
+  <div class="wrap status-grid">
+    <div class="panel">
+      <h2>あなたの進み具合</h2>
+      <div class="progress-num"><b id="doneNum">0</b><span>/ 30日 完了</span></div>
+      <div class="bar"><i id="doneBar"></i></div>
+      <p class="small" id="openNum"></p>
+      <a class="next" id="nextLink" href="#ch1"></a>
+    </div>
+    <div class="panel">
+      <h2>お知らせ</h2>
+      <ul class="news" id="news"></ul>
+      <p class="promise">毎週少しずつ、新しいDAYやワークを追加していきます。買い切りなので、追加ぶんも追加料金なしでそのまま見られます。</p>
+    </div>
+  </div>
+</section>
+
+<section class="how">
+  <div class="wrap">
+    <ol>
+      <li><b>1日1つでOK</b>自分のペースで大丈夫です。止まっても、またここから再開できます</li>
+      <li><b>ワークは書き込み式</b>書いた内容は、お使いのスマホやパソコンに残ります</li>
+      <li><b>終わったらチェック</b>DAYの下の「完了」にチェックすると、進み具合が増えていきます</li>
+    </ol>
+  </div>
+</section>
+
+<main id="chapters"></main>
+
+<footer>
+  <span>30日実践講座</span>
+  <span>このページは購入者さま専用です。URLの共有はご遠慮ください。</span>
+</footer>
+
+<script>
+(function(){
+  // ── 毎週の更新はここだけ書き換える ──────────────────
+  const NEWS=[
+    {date:'2026.10.17',text:'講座サイトをオープンしました。DAY1〜3を公開しています',isNew:true}
+  ];
+  const CHAPTERS=[
+    {no:1,title:'戦う市場を決める',desc:'自分の経験と、読者がお金を払ってでも解決したい悩みが重なる場所を見つけていきます。',days:[
+      {t:'「3つの円」で自分を棚卸しする',s:'Can・Want・Mustが重なる場所を探す',url:'../'},
+      {t:'需要をふるいに掛ける3つの質問',s:'ビジネスにするか、趣味にするかを判定',url:'../sieve/'},
+      {t:'掛け合わせで唯一無二のポジションをつくる',s:'悩み×手持ちのカードで一文にする',url:'../position/'},
+      {t:'ライバルを調べて、すき間を見つける',s:'売れている人の商品を3つ並べてみる'},
+      {t:'届けたい読者を一人に決める',s:'年齢・暮らし・夜の悩みまで書き出す'},
+      {t:'コンセプトを一文にまとめる',s:'誰に、何を、どう届けるか'}]},
+    {no:2,title:'商品を設計する',desc:'書き始める前に、何をいくらで、どんな形で届けるのかを決めていきます。',days:[
+      {t:'AIで売れるテーマと目次をつくる',s:'キーワードから目次案を出す'},
+      {t:'読者のビフォー・アフターを描く',s:'買う前と買った後の変化'},
+      {t:'無料と有料の境界線を決める',s:'どこまで見せて、どこから売るか'},
+      {t:'価格の決め方',s:'最初の値段と、値上げの段取り'},
+      {t:'特典をつくる',s:'ワーク・テンプレートで価値を足す'},
+      {t:'タイトルとサムネイル',s:'思わず開きたくなる入口'}]},
+    {no:3,title:'書く',desc:'AIに手伝ってもらいながら、あなたの体験が伝わる記事に仕上げていきます。',days:[
+      {t:'AIで下書きをつくる',s:'目次から本文のたたき台へ'},
+      {t:'自分の体験を入れる',s:'AIにはないリアルな物語'},
+      {t:'共感される書き出し',s:'最初の3行で読者をつかむ'},
+      {t:'読みやすい構成に整える',s:'見出し・改行・図解'},
+      {t:'自分の言葉にリライトする',s:'話すように書くコツ'},
+      {t:'有料部分へつなぐ文章',s:'押し売りしないセールスの書き方'}]},
+    {no:4,title:'届ける',desc:'せっかく作った商品を、必要としている人のところまで運んでいきます。',days:[
+      {t:'プロフィールを整える',s:'この人から買いたいと思われる自己紹介'},
+      {t:'無料記事で信頼をつくる',s:'売る前に、役に立つ'},
+      {t:'SNSで発信する',s:'ThreadsやInstagramの使い方'},
+      {t:'販売ポストの書き方',s:'発売を知らせる投稿'},
+      {t:'導線を設計する',s:'SNSから記事、記事から商品へ'},
+      {t:'発売日の段取り',s:'前日までの準備と当日の動き'}]},
+    {no:5,title:'育てる',desc:'売って終わりではなく、反応を見て、改善して、次の商品へつなげていきます。',days:[
+      {t:'感想・レビューをもらう',s:'お願いの仕方と活かし方'},
+      {t:'数字の見方',s:'ビュー・スキ・購入のどこを見るか'},
+      {t:'値上げのタイミング',s:'早く買った人が得をする設計'},
+      {t:'改善リライト',s:'売れない理由を見つけて直す'},
+      {t:'次の商品へ横展開する',s:'1つの商品から広げる'},
+      {t:'30日の振り返りと次の一歩',s:'ここまでの自分をほめて、次へ'}]}
+  ];
+  // ─────────────────────────────────────────────
+
+  const KEY='course30-progress-v1';
+  let done={};
+  try{done=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){done={}}
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(done))}catch(e){}};
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  const all=[];CHAPTERS.forEach(ch=>ch.days.forEach(d=>all.push(Object.assign({ch:ch.no},d))));
+  all.forEach((d,i)=>d.n=i+1);
+
+  document.getElementById('news').innerHTML=NEWS.map(n=>'<li><time>'+esc(n.date)+'</time><span>'+(n.isNew?'<span class="new">NEW</span>':'')+esc(n.text)+'</span></li>').join('');
+
+  const main=document.getElementById('chapters');
+  main.innerHTML=CHAPTERS.map(ch=>{
+    const vars='--cc:var(--c'+ch.no+');--cs:var(--c'+ch.no+'-soft)';
+    return '<section class="chapter" id="ch'+ch.no+'" style="'+vars+'"><div class="wrap">'+
+      '<div class="ch-head"><div class="ch-no">'+ch.no+'</div><div><p>CHAPTER '+ch.no+'</p><h2>'+esc(ch.title)+'</h2></div></div>'+
+      '<p class="ch-desc">'+esc(ch.desc)+'</p><div class="days">'+
+      all.filter(d=>d.ch===ch.no).map(d=>{
+        const open=!!d.url;
+        const inner='<span class="dn">DAY<b>'+d.n+'</b></span><span class="tt"><strong>'+esc(d.t)+'</strong><span>'+esc(d.s)+'</span></span><span class="state" data-state="'+d.n+'">'+(open?'公開中':'準備中')+'</span>';
+        const card=open?'<a class="day open" data-d="'+d.n+'" href="'+esc(d.url)+'">'+inner+'</a>':'<div class="day soon" data-d="'+d.n+'">'+inner+'</div>';
+        const mark=open?'<div class="mark"><label><input type="checkbox" data-done="'+d.n+'">このDAYを完了にする</label></div>':'';
+        return '<div class="daywrap">'+card+mark+'</div>';
+      }).join('')+'</div></div></section>';
+  }).join('');
+
+  const strip=document.getElementById('strip');
+  strip.innerHTML=all.map(d=>'<i data-s="'+d.n+'" style="background:'+(d.url?'var(--c'+d.ch+')':'var(--line)')+'"></i>').join('');
+
+  function render(){
+    const openDays=all.filter(d=>d.url);
+    const n=openDays.filter(d=>done[d.n]).length;
+    document.getElementById('doneNum').textContent=n;
+    document.getElementById('doneBar').style.width=(n/30*100)+'%';
+    document.getElementById('openNum').textContent='いま公開中：DAY'+openDays.map(d=>d.n).join('・')+'（全'+openDays.length+'日）';
+    document.querySelectorAll('[data-done]').forEach(cb=>{const k=cb.dataset.done;cb.checked=!!done[k];
+      const card=document.querySelector('.day[data-d="'+k+'"]');card.classList.toggle('done',!!done[k]);
+      card.querySelector('.state').textContent=done[k]?'完了':'公開中'});
+    document.querySelectorAll('#strip i').forEach(i=>i.classList.toggle('done',!!done[i.dataset.s]));
+    const next=openDays.find(d=>!done[d.n]);
+    const nl=document.getElementById('nextLink');
+    if(next){nl.href=next.url;nl.innerHTML='<small>次はここから</small>DAY'+next.n+'　'+esc(next.t)}
+    else{nl.href='#ch1';nl.innerHTML='<small>公開中のDAYはすべて完了</small>次の更新まで、ひと休みしましょう'}
+  }
+  document.addEventListener('change',e=>{const cb=e.target.closest('[data-done]');if(!cb)return;
+    if(cb.checked)done[cb.dataset.done]=1;else delete done[cb.dataset.done];save();render()});
+  render();
+})();
+</script>
+
+</body>
+</html>
