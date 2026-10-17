@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>掛け合わせポジションメーカー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,700&display=swap">
+<style>
+/* Layout: シリーズ共通の縦一本ワークブック。左の悩み（変わらないもの）と右のカード（新しい解決手段）を選び、中央の「×」で数式が組み上がって、最後に一枚のポジションカードになる */
+:root{
+  --bg:#F8F6FB;--paper:#FFFFFF;--ink:#2B2633;--muted:#6E6679;--line:#E4DEEC;
+  --pain:#E0577A;--pain-soft:#FBE3EA;      /* 古典的な悩み：紅梅 */
+  --card:#2E9E8F;--card-soft:#DDF2EE;      /* 新しい解決手段：若竹 */
+  --gold:#E3A21A;--gold-soft:#FBEFD2;      /* 希少性：山吹 */
+  --core:#6B4FB8;--core-soft:#ECE6F8;      /* 完成：紫 */
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-latin:"Fraunces",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17141D;--paper:#211D29;--ink:#EEEAF4;--muted:#A79FB3;--line:#352F40;
+  --pain:#F07A98;--pain-soft:#3C2129;--card:#4FC2B2;--card-soft:#1C3532;--gold:#F0BA45;--gold-soft:#3A2F17;--core:#A88EF0;--core-soft:#2B2440;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17141D;--paper:#211D29;--ink:#EEEAF4;--muted:#A79FB3;--line:#352F40;
+  --pain:#F07A98;--pain-soft:#3C2129;--card:#4FC2B2;--card-soft:#1C3532;--gold:#F0BA45;--gold-soft:#3A2F17;--core:#A88EF0;--core-soft:#2B2440;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:780px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.45;margin:0}
+p{margin:0}
+button,input{font:inherit}
+:focus-visible{outline:3px solid var(--core);outline-offset:2px}
+
+/* Hero */
+.hero{padding-block:48px 24px}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--muted);font-weight:700}
+.hero h1{font-size:clamp(25px,5.2vw,36px);font-weight:800;margin-top:10px}
+.lead{margin-top:16px;color:var(--muted);max-width:36em}
+.formula{margin-top:24px;display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center;text-align:center}
+.formula > div{min-width:0;border-radius:16px;padding:14px 10px;font-weight:700;font-size:14px;line-height:1.5}
+.formula .f-pain{background:var(--pain-soft);color:var(--ink)}
+.formula .f-card{background:var(--card-soft);color:var(--ink)}
+.formula .f-pos{background:var(--core);color:#fff}
+.formula small{display:block;font-weight:500;font-size:12px;opacity:.8}
+.op{font-family:var(--f-latin);font-style:italic;font-size:28px;color:var(--muted);font-weight:700}
+
+/* 10人に1人 */
+.rare{padding-block:20px 8px}
+.rare-box{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center}
+.rare-box h2{font-size:19px;font-weight:800}
+.rare-box p{font-size:15px;color:var(--muted);margin-top:8px}
+.calc{display:grid;gap:8px;font-variant-numeric:tabular-nums}
+.calc div{display:flex;justify-content:space-between;gap:10px;align-items:baseline;border-bottom:1px dashed var(--line);padding-bottom:6px;font-size:14px}
+.calc b{font-family:var(--f-display);font-size:20px}
+.calc .big b{color:var(--gold);font-size:26px}
+
+/* Samples */
+.samples{padding-block:28px 8px}
+.samples h2{font-size:18px;font-weight:800}
+.samples p.sub{font-size:14px;color:var(--muted);margin-top:4px}
+.sample-list{margin-top:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sample{min-width:0;text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;display:grid;gap:6px;color:var(--ink);transition:border-color .2s,transform .2s}
+.sample:hover{border-color:var(--core);transform:translateY(-2px)}
+.sample .s-eq{font-size:13px;font-weight:700;line-height:1.6}
+.sample .s-eq .p{color:var(--pain)}.sample .s-eq .c{color:var(--card)}
+.sample .s-res{font-size:13px;color:var(--muted);line-height:1.7}
+.sample .s-go{font-size:12px;font-weight:700;color:var(--core)}
+.sample.mine{border-color:var(--core);background:var(--core-soft)}
+
+/* Steps */
+.step{padding-block:40px}
+.step + .step{border-top:1px dashed var(--line)}
+.step-head{display:flex;gap:16px;align-items:flex-start}
+.badge{flex:none;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--f-latin);font-style:italic;font-weight:700;font-size:22px}
+.step[data-s="1"] .badge{background:var(--pain)}
+.step[data-s="2"] .badge{background:var(--card)}
+.step[data-s="3"] .badge{background:var(--core)}
+.sno{font-size:12px;letter-spacing:.14em;font-weight:700}
+.step[data-s="1"] .sno{color:var(--pain)}.step[data-s="2"] .sno{color:var(--card)}.step[data-s="3"] .sno{color:var(--core)}
+.step h2{font-size:clamp(19px,3.8vw,24px);font-weight:800}
+.step .intro{margin-top:14px;max-width:36em}
+
+.field{margin-top:18px}
+.field > label,.field > .lbl{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
+.field input[type=text]{width:100%;font-size:17px;color:var(--ink);background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 16px}
+.step[data-s="1"] .field input:focus{border-color:var(--pain);outline:none}
+.step[data-s="2"] .field input:focus{border-color:var(--card);outline:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font-size:14px;font-weight:700;padding:7px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.chip.harm[aria-pressed="true"]{background:var(--pain);border-color:var(--pain);color:#fff}
+.chip.idea{font-weight:500;font-size:14px}
+.chip.idea:hover{border-color:var(--pain)}
+.hint{font-size:13px;color:var(--muted);margin-top:8px}
+.import{margin-top:12px;font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.linkbtn{background:none;border:none;color:var(--core);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}
+
+/* Cards */
+.decks{margin-top:18px;display:grid;gap:22px}
+.deck h3{font-family:var(--f-body);font-size:15px;font-weight:700;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.deck h3 small{font-weight:500;color:var(--muted);font-size:13px}
+.cards{margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kcard{min-width:0;text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;color:var(--ink);display:grid;gap:2px;transition:border-color .2s,background .2s}
+.kcard b{font-size:15px}
+.kcard span{font-size:12px;color:var(--muted);line-height:1.6}
+.kcard[aria-pressed="true"]{background:var(--card);border-color:var(--card);color:#fff}
+.kcard[aria-pressed="true"] span{color:#fff;opacity:.9}
+.kcard:disabled{opacity:.4;cursor:not-allowed}
+.own{display:flex;gap:8px;margin-top:10px}
+.own input{flex:1;min-width:0}
+.own button{flex:none;font-weight:700;border-radius:12px;border:2px solid var(--card);background:transparent;color:var(--card);padding:0 16px;cursor:pointer}
+.picked{position:sticky;bottom:env(safe-area-inset-bottom,0px);margin-top:18px;background:var(--paper);border:2px solid var(--card);border-radius:14px;padding:10px 14px;font-size:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;z-index:4}
+.picked .tagc{background:var(--card-soft);border-radius:999px;padding:2px 10px;font-weight:700;display:inline-flex;gap:6px;align-items:center}
+.picked .tagc button{border:none;background:none;color:var(--muted);cursor:pointer;padding:0;font-size:15px;line-height:1}
+.picked .empty{color:var(--muted)}
+
+/* Result */
+.live{margin-top:18px;display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+.live > div{min-width:0;border-radius:14px;padding:12px 14px;font-size:15px;font-weight:700;line-height:1.6}
+.live .lp{background:var(--pain-soft)}.live .lc{background:var(--card-soft)}
+.live small{display:block;font-size:11px;letter-spacing:.08em;color:var(--muted);font-weight:700}
+.live .op{align-self:center}
+.meter{margin-top:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.meter .bar{flex:1;min-width:180px;height:12px;border-radius:999px;background:var(--line);overflow:hidden}
+.meter .bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .5s ease}
+.meter b{font-family:var(--f-display);font-size:20px;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
+.drafts{margin-top:20px;display:grid;gap:10px}
+.draft{text-align:left;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;color:var(--ink);display:grid;gap:4px}
+.draft small{font-size:12px;font-weight:700;color:var(--core)}
+.draft:hover{border-color:var(--core)}
+.final-card{margin-top:22px;border-radius:22px;padding:24px;background:linear-gradient(135deg,var(--pain-soft),var(--core-soft) 55%,var(--card-soft));border:2px solid var(--core)}
+.final-card label{display:block;font-size:12px;letter-spacing:.14em;font-weight:700;color:var(--core)}
+.final-card textarea{width:100%;min-height:110px;margin-top:8px;resize:vertical;font-family:var(--f-display);font-weight:800;font-size:clamp(18px,3.6vw,22px);line-height:1.7;color:var(--ink);background:transparent;border:none;padding:0}
+.final-card textarea:focus{outline:none}
+.final-card textarea::placeholder{color:var(--muted);font-weight:600}
+.final-card .eq{font-size:13px;color:var(--muted);margin-top:8px}
+
+.checks{margin-top:22px;display:grid;gap:8px}
+.checks h3{font-family:var(--f-body);font-size:15px;font-weight:700}
+.check{display:flex;gap:12px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;font-size:15px}
+.check input{width:20px;height:20px;margin-top:4px;accent-color:var(--core);flex:none}
+.check small{display:block;color:var(--muted);font-size:13px}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;align-items:center}
+.btn{font-weight:700;font-size:15px;padding:12px 20px;border-radius:999px;border:2px solid var(--core);cursor:pointer}
+.btn.primary{background:var(--core);color:#fff}
+.btn.ghost{background:transparent;color:var(--core)}
+.toast{font-size:14px;font-weight:700;color:var(--core)}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;margin-top:10px}
+#copyFallback{width:100%;min-height:140px;margin-top:12px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;color:var(--ink)}
+.closing{margin-top:28px;font-family:var(--f-display);font-weight:800;font-size:18px;text-align:center;color:var(--core)}
+footer{padding-block:28px 40px;font-size:12px;color:var(--muted);text-align:center}
+
+@media (max-width:640px){
+  .hero{padding-block:32px 16px}
+  .formula{grid-template-columns:1fr;gap:4px}
+  .formula .op{font-size:22px}
+  .rare-box{grid-template-columns:1fr}
+  .sample-list{grid-template-columns:1fr}
+  .cards{grid-template-columns:1fr 1fr}
+  .live{grid-template-columns:1fr}
+  .badge{width:48px;height:48px;font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">実践ノウハウ③ ワークシート</p>
+    <h1>選ぶだけでつくれる、あなただけの「掛け合わせポジション」</h1>
+    <p class="lead">「唯一無二」や「掛け合わせ」と聞いても、ピンとこなくて大丈夫です。このページでは、悩みを選んで、手持ちのカードを選んでいくだけで、あなたのポジションの一文ができあがります。</p>
+    <div class="formula" aria-label="ポジショニング構築の基本数式">
+      <div class="f-pain">ターゲットの深刻な悩み<small>HARM領域・変わらないもの</small></div>
+      <span class="op">×</span>
+      <div class="f-card">最新トレンド / 独自の解決手段<small>あなたの手持ちのカード</small></div>
+      <span class="op">=</span>
+      <div class="f-pos">唯一無二のポジション<small>競合がいない独占市場</small></div>
+    </div>
+  </div>
+</header>
+
+<section class="rare">
+  <div class="wrap">
+    <div class="rare-box">
+      <div>
+        <h2>「10人に1人」を掛け合わせると、希少になる</h2>
+        <p>一つのジャンルで100人に1人のプロになるのは大変ですが、10人に1人くらいなら、少しの努力と経験で誰でもなれますよね。それを2つ、3つと掛け合わせるだけで、ぐっと希少になります。</p>
+      </div>
+      <div class="calc">
+        <div><span>恋愛の悩みを語れる</span><b>10人に1人</b></div>
+        <div><span>× AIを使いこなせる</span><b>× 10人に1人</b></div>
+        <div class="big"><span>＝ AIで恋愛LINEを組み立てる人</span><b>100人に1人</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="samples">
+  <div class="wrap">
+    <h2>まずは例を見てみましょう</h2>
+    <p class="sub">タップすると、下のワークに例が入ります。どんなふうに組み立てるのか、つかんでみてくださいね。</p>
+    <div class="sample-list" id="samples"></div>
+  </div>
+</section>
+
+<main>
+  <section class="step" data-s="1" id="s1">
+    <div class="wrap">
+      <div class="step-head">
+        <div class="badge">1</div>
+        <div><p class="sno">STEP 1 ・ 変わらないもの</p><h2>誰の、どんな悩みを解決しますか？</h2></div>
+      </div>
+      <p class="intro">前章で「ビジネスにする」と判定した悩みを入れます。人間の古典的な悩み、つまり何年たっても変わらない悩みです。</p>
+      <div class="import" id="importBox" hidden>
+        <span>前章で合格した候補があります。</span>
+        <span id="importList"></span>
+      </div>
+      <div class="field">
+        <span class="lbl">どの領域ですか？</span>
+        <div class="chips" id="harm"></div>
+      </div>
+      <div class="field">
+        <label for="f-who">誰の（ターゲット）</label>
+        <input type="text" id="f-who" placeholder="例：50代で好きな人ができた女性">
+        <div class="chips" id="whoIdeas" style="margin-top:10px"></div>
+      </div>
+      <div class="field">
+        <label for="f-pain">どんな悩み</label>
+        <input type="text" id="f-pain" placeholder="例：LINEの返信が遅くて不安になってしまう">
+        <div class="chips" id="painIdeas" style="margin-top:10px"></div>
+        <p class="hint">候補をタップすると入ります。自分の言葉に書きかえてもOKです。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" data-s="2" id="s2">
+    <div class="wrap">
+      <div class="step-head">
+        <div class="badge">2</div>
+        <div><p class="sno">STEP 2 ・ 新しい解決手段</p><h2>あなたの手持ちのカードを選びましょう</h2></div>
+      </div>
+      <p class="intro">「10人に1人くらいはできる」と思えるものでOKです。すごい実績じゃなくて大丈夫なので、ピンときたものを1〜2枚選んでください。</p>
+      <div class="decks" id="decks"></div>
+      <div class="field">
+        <label for="f-own">ここにない自分のカードを足す</label>
+        <div class="own"><input type="text" id="f-own" placeholder="例：元パン屋さん、手帳を10年続けている"><button type="button" id="ownBtn">追加</button></div>
+      </div>
+      <div class="picked" id="picked" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="step" data-s="3" id="s3">
+    <div class="wrap">
+      <div class="step-head">
+        <div class="badge">3</div>
+        <div><p class="sno">STEP 3 ・ 掛け合わせる</p><h2>あなただけのポジションを一文にしましょう</h2></div>
+      </div>
+      <div class="live">
+        <div class="lp"><small>悩み</small><span id="lvPain">STEP 1で選んでください</span></div>
+        <span class="op">×</span>
+        <div class="lc"><small>カード</small><span id="lvCard">STEP 2で選んでください</span></div>
+      </div>
+      <div class="meter">
+        <div class="bar"><i id="meterBar"></i></div>
+        <b id="meterText">10人に1人</b>
+      </div>
+      <p class="hint" id="meterHint">カードを足すほど、あなたの希少性が上がっていきます。</p>
+
+      <div class="drafts" id="drafts"></div>
+
+      <div class="final-card">
+        <label for="f-final">あなたの唯一無二のポジション</label>
+        <textarea id="f-final" placeholder="上の文章をタップすると、ここに入ります。自分らしい言葉に書きかえて仕上げましょう"></textarea>
+        <p class="eq" id="finalEq"></p>
+      </div>
+
+      <div class="checks">
+        <h3>仕上げのチェック</h3>
+        <label class="check"><input type="checkbox" id="c1"><span>悩みは、何年たっても変わらない古典的なものですか？<small>恋愛・お金・健康・キャリアの悩みは、時代が変わってもなくなりません</small></span></label>
+        <label class="check"><input type="checkbox" id="c2"><span>読者に「この切り口なら、今度こそ解決できるかも」と思ってもらえますか？<small>読者は色々な方法を試して疲れています。新しい希望を見せられるかがポイントです</small></span></label>
+        <label class="check"><input type="checkbox" id="c3"><span>そのカードを、あなたは自分の経験として語れますか？<small>10人に1人くらいでOK。完璧じゃなくて大丈夫です</small></span></label>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" type="button" id="copyBtn">完成したポジションをコピー</button>
+        <button class="btn ghost" type="button" id="resetBtn">最初からやり直す</button>
+        <span class="toast" id="toast" role="status"></span>
+      </div>
+      <div class="confirm" id="confirmBox" hidden>
+        <span>選んだ内容をすべて消しますか？</span>
+        <button class="btn primary" type="button" id="confirmYes">消す</button>
+        <button class="btn ghost" type="button" id="confirmNo">やめる</button>
+      </div>
+      <textarea id="copyFallback" readonly hidden aria-label="コピー用テキスト"></textarea>
+      <p class="closing">ブルーオーシャンは、あなたの手持ちのカードから創り出せます。</p>
+    </div>
+  </section>
+</main>
+
+<footer>「クロスマーケティング手法」で市場のポジションを独占する技術</footer>
+
+<script>
+(function(){
+  const KEY='cross-position-v1', SIEVE='pains-gains-sieve-v1';
+  const HARM={
+    '人間関係・恋愛':{who:['50代で好きな人ができた女性','婚活中の40代女性','夫婦関係に悩む妻','職場の人間関係に疲れた人','ママ友付き合いがしんどい人'],
+      pain:['LINEの返信が遅くて不安になってしまう','好きな人に重いと思われるのが怖い','婚活しても出会いが続かない','夫と会話がなくなった','人に嫌われるのが怖くて断れない']},
+    'お金':{who:['子育て中の主婦','50代のおひとりさま','副業を始めたい会社員','年金が不安なシニア'],
+      pain:['副業で稼ぎたいけど時間がない','老後のお金が不安で眠れない','何から始めればいいか分からない','節約しても貯金が増えない']},
+    '健康':{who:['更年期の50代女性','産後の体型が戻らないママ','睡眠に悩む会社員','親の介護をしている人'],
+      pain:['更年期のイライラが止まらない','ダイエットが続かない','夜中に目が覚めて眠れない','介護疲れで自分の時間がない']},
+    'キャリア':{who:['転職に迷う30代','子育てが落ち着いた主婦','定年後が見えてきた50代','職場で評価されない人'],
+      pain:['今の仕事を辞めたいけど一歩が出ない','ブランクがあって再就職が怖い','自分の強みが分からない','この先のキャリアが見えない']}
+  };
+  const DECKS=[
+    {t:'最新ツール',d:'時代のトレンド',cards:[
+      {n:'AI（ChatGPT）',s:'質問すると答えをくれる',how:'AI（ChatGPT）に手伝ってもらって'},
+      {n:'音声入力',s:'しゃべるだけで文章に',how:'スマホに話すだけで'},
+      {n:'Canva',s:'スマホでデザイン',how:'Canvaでかんたんに形にして'},
+      {n:'スマホだけ',s:'パソコンなしで完結',how:'スマホ1台だけで'},
+      {n:'LINE・アプリ',s:'毎日の習慣にのせる',how:'毎日使うLINEやアプリを使って'},
+      {n:'スプレッドシート',s:'見える化・記録',how:'表に書き出して見える化しながら'}]},
+    {t:'前職・経験の思考法',d:'仕事で身についた見方',cards:[
+      {n:'コンサル思考',s:'分析して戦略を立てる',how:'コンサルタントの分析の型を使って'},
+      {n:'営業・接客',s:'相手の気持ちを読む',how:'営業や接客で身につけた相手の心の読み方で'},
+      {n:'看護・介護',s:'寄り添うケアの目線',how:'看護や介護の現場で学んだ寄り添い方で'},
+      {n:'保育・教育',s:'できるまで導く',how:'保育や教育の「できるまで導く」方法で'},
+      {n:'事務・経理',s:'コツコツ整理する',how:'事務や経理で身についた整理の仕方で'},
+      {n:'販売・アパレル',s:'似合うを見抜く',how:'販売の仕事で身につけた「似合う」を見抜く目で'}]},
+    {t:'意外な専門分野',d:'好きで学んできたこと',cards:[
+      {n:'心理学',s:'心の仕組みで説明',how:'心理学の仕組みを使って'},
+      {n:'タロット・占い',s:'気持ちを整理する',how:'タロットで気持ちを整理しながら'},
+      {n:'脳科学',s:'脳のクセで理解',how:'脳のクセを知ることで'},
+      {n:'手帳術・ノート術',s:'書いて整える',how:'手帳に書き出して整えながら'},
+      {n:'料理・家事',s:'暮らしの知恵',how:'毎日の料理や家事にたとえて'},
+      {n:'ゲーム感覚',s:'楽しく続ける',how:'ゲーム感覚で楽しく続けながら'}]},
+    {t:'あなたの立場・人生経験',d:'同じ立場だから響く',cards:[
+      {n:'50代から挑戦',s:'年齢をあきらめない',how:'50代から挑戦した経験をもとに'},
+      {n:'離婚・再出発',s:'どん底からの立て直し',how:'離婚から立て直した経験をもとに'},
+      {n:'シングルマザー',s:'時間もお金も限られる',how:'シングルマザーとして工夫してきた経験で'},
+      {n:'地方在住',s:'近くに何もなくても',how:'地方にいながら'},
+      {n:'元・人見知り',s:'苦手を克服した',how:'人見知りを克服した経験をもとに'},
+      {n:'失敗だらけ',s:'遠回りしてきた',how:'たくさん失敗してきた経験をもとに'}]}
+  ];
+  const SAMPLES=[
+    {harm:'人間関係・恋愛',who:'恋愛・婚活に悩む女性',pain:'LINEの返信に感情が振り回されてしまう',cards:['AI（ChatGPT）'],
+     res:'AIを使って、感情に振り回されず論理的にLINEの返信を構築する恋愛コンテンツ',mine:true},
+    {harm:'キャリア',who:'転職に迷っている人',pain:'転職に失敗したくない',cards:['コンサル思考'],
+     res:'経営コンサルタントが企業分析に使う手法で、絶対に失敗しないキャリア戦略を立てる'},
+    {harm:'お金',who:'時間がない会社員や主婦',pain:'副業で稼ぎたいけど書く時間がない',cards:['音声入力'],
+     res:'スマホに向かって喋るだけで記事が完成する、時短の副業術'}
+  ];
+  const ALL={};DECKS.forEach(d=>d.cards.forEach(c=>ALL[c.n]=c));
+  const MAX=3;
+
+  const blank=()=>({harm:'',who:'',pain:'',cards:[],own:[],final:'',checks:[false,false,false]});
+  let st;try{st=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){st=null}
+  if(!st||typeof st!=='object')st=blank();
+  st=Object.assign(blank(),st);
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const cardOf=n=>ALL[n]||{n,s:'あなたのカード',how:n+'を活かして'};
+
+  // samples
+  $('samples').innerHTML=SAMPLES.map((s,i)=>'<button type="button" class="sample'+(s.mine?' mine':'')+'" data-i="'+i+'"><span class="s-eq"><span class="p">'+esc(s.pain)+'</span> × <span class="c">'+esc(s.cards.join('・'))+'</span></span><span class="s-res">➔ '+esc(s.res)+'</span><span class="s-go">'+(s.mine?'私が確立したポジション ・ ':'')+'この例で試す</span></button>').join('');
+  $('samples').addEventListener('click',e=>{const b=e.target.closest('.sample');if(!b)return;const s=SAMPLES[+b.dataset.i];
+    st=Object.assign(blank(),{harm:s.harm,who:s.who,pain:s.pain,cards:s.cards.slice(),final:s.res});save();render();
+    say('例を入れました。STEP 1から見ていきましょう');$('s1').scrollIntoView({behavior:'smooth'})});
+
+  // harm
+  $('harm').innerHTML=Object.keys(HARM).map(h=>'<button type="button" class="chip harm" data-h="'+h+'" aria-pressed="false">'+h+'</button>').join('');
+  $('harm').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;st.harm=st.harm===b.dataset.h?'':b.dataset.h;save();render()});
+  function ideas(box,list,key){box.innerHTML=list.map(t=>'<button type="button" class="chip idea">'+esc(t)+'</button>').join('');
+    box.onclick=e=>{const b=e.target.closest('.chip');if(!b)return;st[key]=b.textContent;save();render()}}
+  $('f-who').addEventListener('input',e=>{st.who=e.target.value;save();renderResult()});
+  $('f-pain').addEventListener('input',e=>{st.pain=e.target.value;save();renderResult()});
+
+  // decks
+  $('decks').innerHTML=DECKS.map(d=>'<div class="deck"><h3>'+d.t+'<small>'+d.d+'</small></h3><div class="cards">'+
+    d.cards.map(c=>'<button type="button" class="kcard" data-n="'+esc(c.n)+'" aria-pressed="false"><b>'+esc(c.n)+'</b><span>'+esc(c.s)+'</span></button>').join('')+'</div></div>').join('');
+  $('decks').addEventListener('click',e=>{const b=e.target.closest('.kcard');if(!b||b.disabled)return;toggle(b.dataset.n)});
+  function toggle(n){const i=st.cards.indexOf(n);if(i>=0)st.cards.splice(i,1);else if(st.cards.length<MAX)st.cards.push(n);save();render()}
+  $('ownBtn').addEventListener('click',addOwn);
+  $('f-own').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();addOwn()}});
+  function addOwn(){const v=$('f-own').value.trim();if(!v)return;if(st.cards.length>=MAX){say('カードは3枚までです');return}
+    if(!st.cards.includes(v))st.cards.push(v);$('f-own').value='';save();render()}
+  $('picked').addEventListener('click',e=>{const b=e.target.closest('button[data-rm]');if(b)toggle(b.dataset.rm)});
+
+  function rarity(){const n=st.cards.length;return n===0?1:Math.pow(10,n+1)}
+  function drafts(){
+    const who=st.who.trim()||'〇〇な人',pain=st.pain.trim()||'〇〇という悩み';
+    const cs=st.cards.map(cardOf);
+    if(!cs.length)return [];
+    const how=cs.map(c=>c.how).join('、');
+    const names=cs.map(c=>c.n).join('×');
+    return [
+      {k:'王道の形',t:who+'の「'+pain+'」を、'+how+'解決するコンテンツ'},
+      {k:'呼びかけの形',t:pain.replace(/。$/,'')+'と悩む'+who+'へ。'+how+'、今度こそ抜け出せる方法を届けます'},
+      {k:'肩書きの形',t:names+'で、'+who+'の'+pain.replace(/。$/,'')+'に寄り添う人'}
+    ];
+  }
+  function renderResult(){
+    const pain=(st.who.trim()?st.who.trim()+'の':'')+(st.pain.trim()||'');
+    $('lvPain').textContent=pain||'STEP 1で選んでください';
+    $('lvCard').textContent=st.cards.length?st.cards.join(' × '):'STEP 2で選んでください';
+    const n=st.cards.length,r=rarity();
+    $('meterBar').style.width=(n===0?8:Math.min(100,n*33))+'%';
+    $('meterText').textContent=(n===0?'10':r.toLocaleString())+'人に1人';
+    $('meterHint').textContent=n===0?'カードを足すほど、あなたの希少性が上がっていきます。':n>=3?'3枚の掛け合わせで、競合がほとんどいないポジションです。':'もう1枚足すと、さらに10倍希少になります。';
+    const ds=drafts();
+    $('drafts').innerHTML=ds.length?'<p class="hint" style="margin:0">気に入った形をタップしてください。下のカードに入ります。</p>'+ds.map((d,i)=>'<button type="button" class="draft" data-i="'+i+'"><small>'+d.k+'</small>'+esc(d.t)+'</button>').join(''):
+      '<p class="hint" style="margin:0">STEP 1とSTEP 2を選ぶと、ここにポジションの文章の候補が3つ出てきます。</p>';
+    $('drafts').querySelectorAll('.draft').forEach(b=>b.onclick=()=>{st.final=ds[+b.dataset.i].t;$('f-final').value=st.final;save();say('ポジションに入れました。自分の言葉に整えましょう')});
+    $('finalEq').textContent=(pain&&n)?'「'+pain+'」 × 「'+st.cards.join('・')+'」':'';
+  }
+  function render(){
+    document.querySelectorAll('.chip.harm').forEach(b=>b.setAttribute('aria-pressed',b.dataset.h===st.harm?'true':'false'));
+    const H=HARM[st.harm]||{who:['50代で好きな人ができた女性','子育て中の主婦','転職に迷う30代','更年期の50代女性'],pain:['領域を選ぶと、悩みの候補が出てきます']};
+    ideas($('whoIdeas'),H.who,'who');
+    if(HARM[st.harm])ideas($('painIdeas'),H.pain,'pain');else{$('painIdeas').innerHTML='<span class="hint" style="margin:0">'+H.pain[0]+'</span>';$('painIdeas').onclick=null}
+    $('f-who').value=st.who;$('f-pain').value=st.pain;
+    document.querySelectorAll('.kcard').forEach(b=>{const on=st.cards.includes(b.dataset.n);b.setAttribute('aria-pressed',on?'true':'false');b.disabled=!on&&st.cards.length>=MAX});
+    $('picked').innerHTML=st.cards.length?'<span>選んだカード：</span>'+st.cards.map(n=>'<span class="tagc">'+esc(n)+'<button type="button" data-rm="'+esc(n)+'" aria-label="'+esc(n)+'を外す">×</button></span>').join('')+'<span class="empty">（'+st.cards.length+'/3枚）</span>':'<span class="empty">まだカードが選ばれていません（1〜3枚）</span>';
+    $('f-final').value=st.final;
+    ['c1','c2','c3'].forEach((id,i)=>$(id).checked=!!st.checks[i]);
+    renderResult();
+  }
+  $('f-final').addEventListener('input',e=>{st.final=e.target.value;save()});
+  ['c1','c2','c3'].forEach((id,i)=>$(id).addEventListener('change',e=>{st.checks[i]=e.target.checked;save()}));
+
+  // 前章の「ふるい」で合格した候補を読み込む
+  try{const s=JSON.parse(localStorage.getItem(SIEVE)||'null');
+    const ok=(s&&Array.isArray(s.c))?s.c.filter(c=>c&&c.name&&c.name.trim()&&Array.isArray(c.a)&&c.a.every(v=>v==='y')):[];
+    if(ok.length){$('importBox').hidden=false;
+      $('importList').innerHTML=ok.map((c,i)=>'<button type="button" class="linkbtn" data-i="'+i+'">'+esc(c.name.trim().slice(0,30))+'</button>').join(' ／ ');
+      $('importList').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;st.pain=ok[+b.dataset.i].name.trim();save();render();say('前章の候補を「どんな悩み」に入れました')})}
+  }catch(e){}
+
+  const toast=$('toast');
+  function say(m){toast.textContent=m;clearTimeout(say.t);say.t=setTimeout(()=>toast.textContent='',3200)}
+  function compose(){
+    return ['【私の唯一無二のポジション】',st.final.trim()||'（未記入）','',
+      '■ 悩み（変わらないもの）',(st.harm?'['+st.harm+'] ':'')+(st.who.trim()?st.who.trim()+'の':'')+(st.pain.trim()||'（未記入）'),'',
+      '■ 掛け合わせたカード',st.cards.length?st.cards.join(' × '):'（未選択）','',
+      '■ 希少性：'+(st.cards.length?rarity().toLocaleString():'10')+'人に1人'].join('\n');
+  }
+  $('copyBtn').addEventListener('click',()=>{
+    const text=compose(),fb=$('copyFallback');
+    const fallback=()=>{fb.value=text;fb.hidden=false;fb.focus();fb.select();say('下の欄を長押し（または選択）してコピーしてください')};
+    try{navigator.clipboard.writeText(text).then(()=>{fb.hidden=true;say('コピーしました。プロフィールや記事づくりに使いましょう')}).catch(fallback)}catch(e){fallback()}
+  });
+  $('resetBtn').addEventListener('click',()=>{$('confirmBox').hidden=false});
+  $('confirmNo').addEventListener('click',()=>{$('confirmBox').hidden=true});
+  $('confirmYes').addEventListener('click',()=>{st=blank();try{localStorage.removeItem(KEY)}catch(e){}$('confirmBox').hidden=true;render();say('まっさらに戻しました')});
+  render();
+})();
+</script>
+
+</body>
+</html>
