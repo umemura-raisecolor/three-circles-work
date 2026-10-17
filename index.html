@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>3つの円ワークシート</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,700&display=swap">
+<style>
+/* Layout: 縦一本のワークブック。冒頭にベン図、各Stepは色の帯で区切り、最後に3つが重なる中心へ集まる */
+:root{
+  --bg:#F8F6FB;            /* 薄藤の白 */
+  --paper:#FFFFFF;
+  --ink:#2B2633;
+  --muted:#6E6679;
+  --line:#E4DEEC;
+  --can:#2E9E8F;           /* 若竹 */
+  --can-soft:#DDF2EE;
+  --want:#E0577A;          /* 紅梅 */
+  --want-soft:#FBE3EA;
+  --must:#E3A21A;          /* 山吹 */
+  --must-soft:#FBEFD2;
+  --core:#6B4FB8;          /* 重なりの紫 */
+  --core-soft:#ECE6F8;
+  --blend:multiply;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-latin:"Fraunces",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17141D;--paper:#211D29;--ink:#EEEAF4;--muted:#A79FB3;--line:#352F40;
+  --can:#4FC2B2;--can-soft:#1C3532;--want:#F07A98;--want-soft:#3C2129;
+  --must:#F0BA45;--must-soft:#3A2F17;--core:#A88EF0;--core-soft:#2B2440;--blend:screen;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17141D;--paper:#211D29;--ink:#EEEAF4;--muted:#A79FB3;--line:#352F40;
+  --can:#4FC2B2;--can-soft:#1C3532;--want:#F07A98;--want-soft:#3C2129;
+  --must:#F0BA45;--must-soft:#3A2F17;--core:#A88EF0;--core-soft:#2B2440;--blend:screen;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.45;margin:0}
+p{margin:0}
+.latin{font-family:var(--f-latin);font-style:italic;font-weight:700;letter-spacing:.01em}
+
+/* Hero */
+.hero{padding-block:48px 24px}
+.hero-grid{display:grid;grid-template-columns:1fr 260px;gap:28px;align-items:center}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--muted);font-weight:700}
+.hero h1{font-size:clamp(26px,5.4vw,38px);font-weight:800;margin-top:10px}
+.hero h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--core-soft) 62%)}
+.lead{margin-top:16px;color:var(--muted);max-width:34em}
+.venn{width:100%;max-width:260px;justify-self:center}
+.venn circle{mix-blend-mode:var(--blend);transition:fill-opacity .5s ease}
+.venn text{font-family:var(--f-latin);font-style:italic;font-weight:700;font-size:17px}
+.venn .core-dot{fill:var(--core);transition:r .5s ease,opacity .5s}
+
+/* Progress */
+.progress{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.progress .wrap{display:flex;gap:8px;align-items:center;padding-block:10px;overflow-x:auto}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:4px 12px;border-radius:999px;border:1.5px solid var(--line);color:var(--muted);text-decoration:none;white-space:nowrap;transition:all .3s}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.pill.done{color:var(--ink)}
+.pill[data-k="can"].done{border-color:var(--can);background:var(--can-soft)}.pill[data-k="can"].done .dot{background:var(--can)}
+.pill[data-k="want"].done{border-color:var(--want);background:var(--want-soft)}.pill[data-k="want"].done .dot{background:var(--want)}
+.pill[data-k="must"].done{border-color:var(--must);background:var(--must-soft)}.pill[data-k="must"].done .dot{background:var(--must)}
+.pill[data-k="core"].done{border-color:var(--core);background:var(--core-soft)}.pill[data-k="core"].done .dot{background:var(--core)}
+.save-note{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+
+/* How to */
+.howto{padding-block:28px 8px}
+.howto ol{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.howto li{font-size:14px;color:var(--muted);border-top:2px solid var(--line);padding-top:10px}
+.howto b{display:block;color:var(--ink);font-size:15px}
+
+/* Steps */
+.step{padding-block:40px}
+.step + .step{border-top:1px dashed var(--line)}
+.step-head{display:flex;gap:16px;align-items:flex-start}
+.badge{flex:none;width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-size:20px;color:#fff}
+.step[data-k="can"] .badge{background:var(--can)}
+.step[data-k="want"] .badge{background:var(--want)}
+.step[data-k="must"] .badge{background:var(--must)}
+.step-no{font-size:12px;letter-spacing:.14em;font-weight:700}
+.step[data-k="can"] .step-no{color:var(--can)}
+.step[data-k="want"] .step-no{color:var(--want)}
+.step[data-k="must"] .step-no{color:var(--must)}
+.step h2{font-size:clamp(20px,4vw,25px);font-weight:800}
+.step h2 small{display:block;font-family:var(--f-body);font-size:14px;font-weight:500;color:var(--muted);margin-top:2px}
+.intro{margin-top:16px}
+
+.prompts{margin-top:18px;display:grid;gap:8px}
+.prompt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;font:inherit;font-size:15px;line-height:1.7;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;transition:border-color .2s,transform .2s}
+.prompt:hover{transform:translateX(2px)}
+.prompt:focus-visible,.chip:focus-visible,.btn:focus-visible,textarea:focus-visible,.pill:focus-visible{outline:3px solid var(--core);outline-offset:2px}
+.prompt .plus{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:15px;font-weight:700;margin-top:2px}
+.step[data-k="can"] .prompt .plus{background:var(--can-soft);color:var(--can)}
+.step[data-k="want"] .prompt .plus{background:var(--want-soft);color:var(--want)}
+.step[data-k="must"] .prompt .plus{background:var(--must-soft);color:var(--must)}
+.step[data-k="can"] .prompt:hover{border-color:var(--can)}
+.step[data-k="want"] .prompt:hover{border-color:var(--want)}
+.step[data-k="must"] .prompt:hover{border-color:var(--must)}
+.tip{font-size:13px;color:var(--muted);margin-top:6px}
+
+.sheet{margin-top:20px;border-radius:16px;padding:16px;background:var(--paper);border:2px solid var(--line);transition:border-color .3s}
+.step[data-k="can"] .sheet{border-color:color-mix(in srgb,var(--can) 45%,var(--line))}
+.step[data-k="want"] .sheet{border-color:color-mix(in srgb,var(--want) 45%,var(--line))}
+.step[data-k="must"] .sheet{border-color:color-mix(in srgb,var(--must) 45%,var(--line))}
+.sheet label{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
+textarea{width:100%;min-height:180px;resize:vertical;font:inherit;font-size:16px;line-height:1.9;color:var(--ink);background:transparent;border:none;padding:4px 2px;
+  background-image:linear-gradient(transparent calc(1.9em - 1px),var(--line) calc(1.9em - 1px));background-size:100% 1.9em;background-attachment:local}
+textarea::placeholder{color:var(--muted);opacity:.75}
+.count{text-align:right;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+details.example{margin-top:14px;font-size:14px}
+details.example summary{cursor:pointer;color:var(--muted);font-weight:700}
+details.example div{margin-top:8px;padding:12px 14px;border-radius:12px;background:var(--core-soft);line-height:1.8}
+
+.harm{margin-top:18px}
+.harm p{font-size:14px;font-weight:700;margin-bottom:8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:14px;font-weight:700;padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer;transition:all .2s}
+.chip .ab{font-family:var(--f-latin);font-style:italic;color:var(--must);margin-right:4px}
+.chip[aria-pressed="true"]{background:var(--must);border-color:var(--must);color:#fff}
+.chip[aria-pressed="true"] .ab{color:#fff}
+
+/* Final */
+.final{margin-top:24px;padding-block:44px 52px;background:var(--core-soft)}
+.final .eyebrow{color:var(--core)}
+.final h2{font-size:clamp(22px,4.6vw,30px);font-weight:800;margin-top:8px}
+.final .intro{max-width:36em}
+.recap{margin-top:22px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.recap > div{min-width:0;background:var(--paper);border-radius:12px;padding:12px 14px;border-top:4px solid}
+.recap .r-can{border-color:var(--can)}.recap .r-want{border-color:var(--want)}.recap .r-must{border-color:var(--must)}
+.recap h3{font-family:var(--f-latin);font-style:italic;font-size:16px}
+.recap .r-can h3{color:var(--can)}.recap .r-want h3{color:var(--want)}.recap .r-must h3{color:var(--must)}
+.recap p{font-size:13px;color:var(--muted);white-space:pre-wrap;word-break:break-word;max-height:9.5em;overflow:auto;margin-top:4px}
+.final .sheet{border-color:var(--core)}
+.final .question{margin-top:18px;font-size:14px;color:var(--muted);display:grid;gap:4px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;align-items:center}
+.btn{font:inherit;font-weight:700;font-size:15px;padding:12px 20px;border-radius:999px;border:2px solid var(--core);cursor:pointer}
+.btn.primary{background:var(--core);color:#fff}
+.btn.ghost{background:transparent;color:var(--core)}
+.toast{font-size:14px;font-weight:700;color:var(--core)}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+#copyFallback{width:100%;min-height:140px;margin-top:12px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;background-image:none}
+
+footer{padding-block:28px 40px;font-size:12px;color:var(--muted);text-align:center}
+
+@media (max-width:640px){
+  .hero{padding-block:32px 16px}
+  .hero-grid{grid-template-columns:1fr}
+  .venn{max-width:210px;order:-1}
+  .howto ol{grid-template-columns:1fr}
+  .recap{grid-template-columns:1fr}
+  .badge{width:52px;height:52px;font-size:17px}
+  .save-note{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">実践ワークシート</p>
+      <h1>「3つの円」で<em>戦うべき市場</em>を見つける自己棚卸し</h1>
+      <p class="lead">あなたの過去の経験（<span class="latin">Can</span>）、情熱（<span class="latin">Want</span>）、そして市場の需要（<span class="latin">Must</span>）を見える形にして、確実に収益化できる「スウィートスポット」を見つけ出すワークです。直感に頼らず、客観的な事実を文字として書き出してみましょう。</p>
+    </div>
+    <svg class="venn" viewBox="0 0 260 250" role="img" aria-label="Can・Want・Mustの3つの円。書き込むと円に色がつきます">
+      <circle id="vc-can" cx="92" cy="92" r="70" fill="var(--can)" fill-opacity=".18"/>
+      <circle id="vc-want" cx="168" cy="92" r="70" fill="var(--want)" fill-opacity=".18"/>
+      <circle id="vc-must" cx="130" cy="158" r="70" fill="var(--must)" fill-opacity=".18"/>
+      <circle class="core-dot" id="vc-core" cx="130" cy="114" r="6"/>
+      <text x="56" y="76" fill="var(--can)">Can</text>
+      <text x="164" y="76" fill="var(--want)">Want</text>
+      <text x="106" y="210" fill="var(--must)">Must</text>
+    </svg>
+  </div>
+</header>
+
+<nav class="progress" aria-label="進み具合">
+  <div class="wrap">
+    <a class="pill" data-k="can" href="#can"><span class="dot"></span>Can</a>
+    <a class="pill" data-k="want" href="#want"><span class="dot"></span>Want</a>
+    <a class="pill" data-k="must" href="#must"><span class="dot"></span>Must</a>
+    <a class="pill" data-k="core" href="#core"><span class="dot"></span>重なり</a>
+    <span class="save-note" id="saveNote">書いた内容はこの端末に自動で残ります</span>
+  </div>
+</nav>
+
+<main>
+  <section class="howto">
+    <div class="wrap">
+      <ol>
+        <li><b>問いをタップ</b>問いかけが書き込み欄に入るので、続けて書いていけます</li>
+        <li><b>きれいに書かなくてOK</b>箇条書きでも、単語だけでも大丈夫です</li>
+        <li><b>最後にコピー</b>全部書けたら、まとめてコピーして保存しましょう</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Step 1 -->
+  <section class="step" data-k="can" id="can">
+    <div class="wrap">
+      <div class="step-head">
+        <div class="badge latin">Can</div>
+        <div>
+          <p class="step-no">STEP 1</p>
+          <h2>できること<small>過去の泥臭い体験・克服した知識</small></h2>
+        </div>
+      </div>
+      <p class="intro">単なる「得意なこと」や「資格」だけではなく、過去の痛みを伴う失敗や、苦労して乗り越えた経験こそが価値になります。</p>
+      <div class="prompts">
+        <button class="prompt" type="button" data-target="can"><span class="plus">＋</span>過去に友人や同僚から「なぜかよく相談されること」「感謝されたこと」</button>
+        <button class="prompt" type="button" data-target="can"><span class="plus">＋</span>人生のどん底を味わい、そこから這い上がった経験（例：離婚、婚活、転職、病気克服、ダイエット）</button>
+        <button class="prompt" type="button" data-target="can"><span class="plus">＋</span>これまでに多額のお金や時間を投資して学んできた知識・スキル</button>
+      </div>
+      <p class="tip">タップすると、下の書き出しスペースに問いが入ります。</p>
+      <div class="sheet">
+        <label for="f-can">【Can】あなたの書き出しスペース</label>
+        <textarea id="f-can" data-k="can" placeholder="思いついたことから、ひとつずつ書いていきましょう"></textarea>
+        <div class="count" data-count="can">0文字</div>
+      </div>
+      <details class="example">
+        <summary>記入例を見る</summary>
+        <div>・職場で後輩から恋愛や人間関係の相談をよく受けてきた<br>・40代で離婚して、ゼロから生活を立て直した<br>・自分を変えたくて、心理学の講座に3年・数十万円を使って学んだ</div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Step 2 -->
+  <section class="step" data-k="want" id="want">
+    <div class="wrap">
+      <div class="step-head">
+        <div class="badge latin">Want</div>
+        <div>
+          <p class="step-no">STEP 2</p>
+          <h2>やりたいこと<small>情熱の炎を燃やし続けられるテーマ</small></h2>
+        </div>
+      </div>
+      <p class="intro">コンテンツビジネスはマラソンです。お金をもらえなくても日常的に調べてしまうような、情熱を持てるテーマを見つけます。</p>
+      <div class="prompts">
+        <button class="prompt" type="button" data-target="want"><span class="plus">＋</span>誰に指示されなくても、つい日常的に検索して調べてしまう情報</button>
+        <button class="prompt" type="button" data-target="want"><span class="plus">＋</span>休日や夜中、探求していると時間を忘れて没頭してしまうテーマ</button>
+        <button class="prompt" type="button" data-target="want"><span class="plus">＋</span>お金をもらえなくても、誰かに熱く語りたくなってしまうこと</button>
+      </div>
+      <p class="tip">スマホの検索履歴や、保存している投稿を見返すとヒントが見つかりやすいです。</p>
+      <div class="sheet">
+        <label for="f-want">【Want】あなたの書き出しスペース</label>
+        <textarea id="f-want" data-k="want" placeholder="「好き」より「つい、やってしまう」を探してみましょう"></textarea>
+        <div class="count" data-count="want">0文字</div>
+      </div>
+      <details class="example">
+        <summary>記入例を見る</summary>
+        <div>・男性心理や恋愛のYouTubeを、気づくと夜中まで見ている<br>・友だちの恋の話を聞いて、作戦を一緒に考えるのが楽しい<br>・50代からの生き方の本を、つい買ってしまう</div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Step 3 -->
+  <section class="step" data-k="must" id="must">
+    <div class="wrap">
+      <div class="step-head">
+        <div class="badge latin">Must</div>
+        <div>
+          <p class="step-no">STEP 3</p>
+          <h2>市場が血眼になって求めていること<small>HARM領域</small></h2>
+        </div>
+      </div>
+      <p class="intro">あなたの「Can」と「Want」が、本当にお金に換わるのかという厳しいフィルタリングです。</p>
+      <div class="harm">
+        <p>書き出したテーマは、「HARMの法則」のどれに当てはまりますか？（いくつでも）</p>
+        <div class="chips" role="group" aria-label="HARMの法則">
+          <button class="chip" type="button" data-harm="健康" aria-pressed="false"><span class="ab">H</span>健康</button>
+          <button class="chip" type="button" data-harm="キャリア" aria-pressed="false"><span class="ab">A</span>キャリア</button>
+          <button class="chip" type="button" data-harm="人間関係・恋愛" aria-pressed="false"><span class="ab">R</span>人間関係・恋愛</button>
+          <button class="chip" type="button" data-harm="お金" aria-pressed="false"><span class="ab">M</span>お金</button>
+        </div>
+      </div>
+      <div class="prompts">
+        <button class="prompt" type="button" data-target="must"><span class="plus">＋</span>そのテーマには、読者が「今すぐ、お金を払ってでも解決したい緊急性の高い痛み」が存在しているか？</button>
+        <button class="prompt" type="button" data-target="must"><span class="plus">＋</span>その痛みを抱えているのは、具体的にどんな人か？</button>
+      </div>
+      <div class="sheet">
+        <label for="f-must">【Must】あなたの書き出しスペース</label>
+        <textarea id="f-must" data-k="must" placeholder="当てはまる領域と、読者が抱えている痛みを書いてみましょう"></textarea>
+        <div class="count" data-count="must">0文字</div>
+      </div>
+      <details class="example">
+        <summary>記入例を見る</summary>
+        <div>・人間関係・恋愛（R）に当てはまる<br>・50代で好きな人ができたけど、LINEの返信が遅くて不安で眠れない女性<br>・「嫌われたくない、でもこのまま終わりたくない」という、今すぐ答えがほしい痛みがある</div>
+      </details>
+    </div>
+  </section>
+
+  <!-- Final -->
+  <section class="final" id="core" data-k="core">
+    <div class="wrap">
+      <p class="eyebrow">最終分析</p>
+      <h2>スウィートスポットの特定</h2>
+      <p class="intro">上記で書き出した「Can」「Want」「Must」の3つすべてが重なる要素を抽出します。ここがあなたの戦うべき唯一の市場です。</p>
+
+      <div class="recap" aria-live="polite">
+        <div class="r-can"><h3>Can</h3><p id="rc-can">まだ書かれていません</p></div>
+        <div class="r-want"><h3>Want</h3><p id="rc-want">まだ書かれていません</p></div>
+        <div class="r-must"><h3>Must</h3><p id="rc-must">まだ書かれていません</p></div>
+      </div>
+
+      <div class="question">
+        <span>・3つの欄に、同じ言葉や似たテーマが出てきていませんか？</span>
+        <span>・「誰の」「どんな痛みを」「あなたのどの経験で」解決できるか、一文にしてみましょう</span>
+      </div>
+
+      <div class="sheet">
+        <label for="f-core">あなたのスウィートスポット（3つが重なる領域）</label>
+        <textarea id="f-core" data-k="core" placeholder="例：50代で恋に悩む女性の「LINEの不安」を、自分の離婚と婚活の経験と心理学の知識で解決する"></textarea>
+        <div class="count" data-count="core">0文字</div>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" type="button" id="copyBtn">書いた内容をまとめてコピー</button>
+        <button class="btn ghost" type="button" id="resetBtn">書き直す</button>
+        <span class="toast" id="toast" role="status"></span>
+      </div>
+      <div class="confirm" id="confirmBox" hidden>
+        <span>書いた内容をすべて消しますか？</span>
+        <button class="btn primary" type="button" id="confirmYes">消す</button>
+        <button class="btn ghost" type="button" id="confirmNo">やめる</button>
+      </div>
+      <textarea id="copyFallback" readonly hidden aria-label="コピー用テキスト"></textarea>
+    </div>
+  </section>
+</main>
+
+<footer>「3つの円」で戦うべき市場を見つける自己棚卸し</footer>
+
+<script>
+(function(){
+  const KEY='three-circles-work-v1';
+  const keys=['can','want','must','core'];
+  const fields={};keys.forEach(k=>fields[k]=document.getElementById('f-'+k));
+  const chips=[...document.querySelectorAll('.chip')];
+  let state={};
+  try{state=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){state={}}
+  keys.forEach(k=>{if(typeof state[k]==='string')fields[k].value=state[k]});
+  const harm=new Set(Array.isArray(state.harm)?state.harm:[]);
+  chips.forEach(c=>c.setAttribute('aria-pressed',harm.has(c.dataset.harm)?'true':'false'));
+
+  function save(){
+    const s={harm:[...harm]};keys.forEach(k=>s[k]=fields[k].value);
+    try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}
+  }
+  function filled(k){return fields[k].value.trim().length>0||(k==='must'&&harm.size>0)}
+  function render(){
+    keys.forEach(k=>{
+      const n=fields[k].value.length;
+      document.querySelector('[data-count="'+k+'"]').textContent=n+'文字';
+      document.querySelector('.pill[data-k="'+k+'"]').classList.toggle('done',filled(k));
+      if(k!=='core'){
+        document.getElementById('vc-'+k).setAttribute('fill-opacity',filled(k)?'.55':'.18');
+        let t=fields[k].value.trim();
+        if(k==='must'&&harm.size)t='【'+[...harm].join('・')+'】'+(t?'\n'+t:'');
+        document.getElementById('rc-'+k).textContent=t||'まだ書かれていません';
+      }
+    });
+    const done=['can','want','must'].filter(filled).length;
+    const dot=document.getElementById('vc-core');
+    dot.setAttribute('r',done===3?(filled('core')?22:14):6);
+  }
+  keys.forEach(k=>fields[k].addEventListener('input',()=>{save();render()}));
+
+  document.querySelectorAll('.prompt').forEach(b=>b.addEventListener('click',()=>{
+    const f=fields[b.dataset.target];
+    const q=b.textContent.replace(/^＋/,'').trim();
+    const head='▼'+q+'\n';
+    f.value=(f.value&&!f.value.endsWith('\n')?f.value+'\n\n':f.value)+head;
+    f.focus();f.setSelectionRange(f.value.length,f.value.length);
+    save();render();
+  }));
+  chips.forEach(c=>c.addEventListener('click',()=>{
+    const v=c.dataset.harm;harm.has(v)?harm.delete(v):harm.add(v);
+    c.setAttribute('aria-pressed',harm.has(v)?'true':'false');save();render();
+  }));
+
+  const toast=document.getElementById('toast');
+  function say(m){toast.textContent=m;clearTimeout(say.t);say.t=setTimeout(()=>toast.textContent='',3000)}
+  function compose(){
+    const L=['【3つの円ワークシート】',''];
+    L.push('■ Can（できること）',fields.can.value.trim()||'（未記入）','');
+    L.push('■ Want（やりたいこと）',fields.want.value.trim()||'（未記入）','');
+    L.push('■ Must（市場の需要）');if(harm.size)L.push('HARM：'+[...harm].join('・'));
+    L.push(fields.must.value.trim()||'（未記入）','');
+    L.push('■ スウィートスポット',fields.core.value.trim()||'（未記入）');
+    return L.join('\n');
+  }
+  document.getElementById('copyBtn').addEventListener('click',()=>{
+    const text=compose();const fb=document.getElementById('copyFallback');
+    const fallback=()=>{fb.value=text;fb.hidden=false;fb.focus();fb.select();say('下の欄を長押し（または選択）してコピーしてください')};
+    try{
+      navigator.clipboard.writeText(text).then(()=>{fb.hidden=true;say('コピーしました。メモ帳やLINEに貼って保存しましょう')}).catch(fallback);
+    }catch(e){fallback()}
+  });
+  const box=document.getElementById('confirmBox');
+  document.getElementById('resetBtn').addEventListener('click',()=>{box.hidden=false});
+  document.getElementById('confirmNo').addEventListener('click',()=>{box.hidden=true});
+  document.getElementById('confirmYes').addEventListener('click',()=>{
+    keys.forEach(k=>fields[k].value='');harm.clear();
+    chips.forEach(c=>c.setAttribute('aria-pressed','false'));
+    try{localStorage.removeItem(KEY)}catch(e){}
+    box.hidden=true;render();say('まっさらに戻しました');
+  });
+  render();
+})();
+</script>
+
+</body>
+</html>
