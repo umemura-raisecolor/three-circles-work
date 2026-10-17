@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>需要のふるいワーク</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Fraunces:ital,opsz,wght@1,9..144,500;1,9..144,700&display=swap">
+<style>
+/* Layout: 「3つの円」と同じ縦一本のワークブック。候補をタブで切り替え、3つの質問が上から順にふるいの目になり、最後に一覧で判定する */
+:root{
+  --bg:#F8F6FB;--paper:#FFFFFF;--ink:#2B2633;--muted:#6E6679;--line:#E4DEEC;
+  --night:#4A4FA8;--night-soft:#E5E6F7;     /* 深夜の藍 */
+  --river:#2E9E8F;--river-soft:#DDF2EE;     /* お金の川の若竹 */
+  --heart:#E0577A;--heart-soft:#FBE3EA;     /* 共感の紅梅 */
+  --gold:#E3A21A;--gold-soft:#FBEFD2;       /* 合格の山吹 */
+  --core:#6B4FB8;--core-soft:#ECE6F8;
+  --no:#8A8294;
+  --f-display:"Shippori Mincho B1","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --f-latin:"Fraunces",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#17141D;--paper:#211D29;--ink:#EEEAF4;--muted:#A79FB3;--line:#352F40;
+  --night:#8F94F0;--night-soft:#25264A;--river:#4FC2B2;--river-soft:#1C3532;--heart:#F07A98;--heart-soft:#3C2129;
+  --gold:#F0BA45;--gold-soft:#3A2F17;--core:#A88EF0;--core-soft:#2B2440;--no:#8C8497;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17141D;--paper:#211D29;--ink:#EEEAF4;--muted:#A79FB3;--line:#352F40;
+  --night:#8F94F0;--night-soft:#25264A;--river:#4FC2B2;--river-soft:#1C3532;--heart:#F07A98;--heart-soft:#3C2129;
+  --gold:#F0BA45;--gold-soft:#3A2F17;--core:#A88EF0;--core-soft:#2B2440;--no:#8C8497;color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.85;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.45;margin:0}
+p{margin:0}
+button{font:inherit}
+:focus-visible{outline:3px solid var(--core);outline-offset:2px}
+
+/* Hero */
+.hero{padding-block:48px 20px}
+.hero-grid{display:grid;grid-template-columns:1fr 200px;gap:28px;align-items:center}
+.eyebrow{font-size:12px;letter-spacing:.16em;color:var(--muted);font-weight:700}
+.hero h1{font-size:clamp(25px,5.2vw,36px);font-weight:800;margin-top:10px}
+.hero h1 em{font-style:normal;background:linear-gradient(transparent 62%,var(--night-soft) 62%)}
+.lead{margin-top:16px;color:var(--muted);max-width:34em;display:grid;gap:10px}
+.sieve{width:100%;max-width:200px;justify-self:center}
+.sieve text{font-family:var(--f-body);font-size:11px;font-weight:700}
+
+/* Candidate tabs */
+.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.tabs .wrap{display:flex;gap:8px;align-items:center;padding-block:10px;overflow-x:auto}
+.tab{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--muted);cursor:pointer;white-space:nowrap;max-width:15em}
+.tab span.nm{overflow:hidden;text-overflow:ellipsis}
+.tab[aria-selected="true"]{border-color:var(--core);color:var(--ink);background:var(--core-soft)}
+.tab .marks{display:inline-flex;gap:3px}
+.tab .marks i{width:7px;height:7px;border-radius:50%;background:var(--line)}
+.tab .marks i.y{background:var(--gold)}.tab .marks i.n{background:var(--no)}.tab .marks i.m{background:var(--muted);opacity:.5}
+.tabs .hint{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+
+/* Candidate name */
+.cand{padding-block:32px 8px}
+.cand label{display:block;font-weight:700;font-size:14px;margin-bottom:8px}
+.cand input{width:100%;font:inherit;font-size:18px;font-weight:700;color:var(--ink);background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:12px 16px}
+.cand input:focus{border-color:var(--core);outline:none}
+.import{margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;font-size:14px;color:var(--muted)}
+.linkbtn{background:none;border:none;color:var(--core);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:0}
+
+/* Questions */
+.q{padding-block:36px}
+.q + .q{border-top:1px dashed var(--line)}
+.q-head{display:flex;gap:16px;align-items:flex-start}
+.qbadge{flex:none;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;color:#fff;font-family:var(--f-latin);font-style:italic;font-weight:700;font-size:22px}
+.q[data-q="0"] .qbadge{background:var(--night)}
+.q[data-q="1"] .qbadge{background:var(--river)}
+.q[data-q="2"] .qbadge{background:var(--heart)}
+.qno{font-size:12px;letter-spacing:.14em;font-weight:700}
+.q[data-q="0"] .qno{color:var(--night)}.q[data-q="1"] .qno{color:var(--river)}.q[data-q="2"] .qno{color:var(--heart)}
+.q h2{font-size:clamp(19px,3.8vw,23px);font-weight:800}
+details.why{margin-top:14px}
+details.why summary{cursor:pointer;font-size:14px;font-weight:700;color:var(--muted)}
+details.why .body{margin-top:10px;display:grid;gap:10px;font-size:15px;padding:14px 16px;border-radius:12px;background:var(--paper);border:1px solid var(--line)}
+.contrast{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.contrast div{border-radius:10px;padding:10px 12px;font-size:14px}
+.contrast .day{background:var(--gold-soft)}
+.contrast .night{background:var(--night-soft)}
+.contrast b{display:block;font-size:12px;letter-spacing:.08em}
+
+.memo{margin-top:16px;border-radius:16px;padding:14px 16px;background:var(--paper);border:2px solid var(--line)}
+.q[data-q="0"] .memo{border-color:color-mix(in srgb,var(--night) 40%,var(--line))}
+.q[data-q="1"] .memo{border-color:color-mix(in srgb,var(--river) 40%,var(--line))}
+.q[data-q="2"] .memo{border-color:color-mix(in srgb,var(--heart) 40%,var(--line))}
+.memo label{display:block;font-weight:700;font-size:14px;margin-bottom:6px}
+textarea{width:100%;min-height:120px;resize:vertical;font:inherit;font-size:16px;line-height:1.9;color:var(--ink);background:transparent;border:none;padding:4px 2px;
+  background-image:linear-gradient(transparent calc(1.9em - 1px),var(--line) calc(1.9em - 1px));background-size:100% 1.9em;background-attachment:local}
+textarea:focus{outline:none}
+textarea::placeholder{color:var(--muted);opacity:.75}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{font-size:14px;font-weight:700;padding:6px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--river);border-color:var(--river);color:#fff}
+
+.answer{margin-top:16px}
+.answer p{font-size:14px;font-weight:700;margin-bottom:8px}
+.yn{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.yn button{padding:12px 8px;border-radius:12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer;line-height:1.4}
+.yn button small{display:block;font-weight:500;font-size:12px;color:var(--muted)}
+.yn button[data-v="y"][aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#fff}
+.yn button[data-v="m"][aria-pressed="true"]{background:var(--core-soft);border-color:var(--core)}
+.yn button[data-v="n"][aria-pressed="true"]{background:var(--no);border-color:var(--no);color:#fff}
+.yn button[aria-pressed="true"] small{color:inherit}
+
+/* Verdict */
+.verdict{margin-block:8px 32px;border-radius:20px;padding:24px;border:2px solid var(--line);background:var(--paper);display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.verdict .mark{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:22px;background:var(--line);color:var(--muted)}
+.verdict h3{font-size:20px;font-weight:800}
+.verdict p{font-size:15px;color:var(--muted);margin-top:4px}
+.verdict.pass{border-color:var(--gold);background:var(--gold-soft)}
+.verdict.pass .mark{background:var(--gold);color:#fff}
+.verdict.hobby{border-color:var(--no)}
+.verdict.hobby .mark{background:var(--no);color:#fff}
+.verdict.wait{border-color:var(--core);background:var(--core-soft)}
+.verdict.wait .mark{background:var(--core);color:#fff}
+
+/* Final */
+.final{padding-block:44px 52px;background:var(--core-soft)}
+.final .eyebrow{color:var(--core)}
+.final h2{font-size:clamp(22px,4.6vw,30px);font-weight:800;margin-top:8px}
+.judge{margin-top:16px;display:grid;gap:10px;max-width:36em}
+.judge strong{background:linear-gradient(transparent 60%,var(--gold-soft) 60%)}
+.tablebox{margin-top:22px;overflow-x:auto;background:var(--paper);border-radius:16px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:480px}
+th,td{padding:12px 14px;text-align:center;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:700}
+td:first-child,th:first-child{text-align:left}
+tr:last-child td{border-bottom:none}
+.dot{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;font-weight:700;font-size:13px}
+.dot.y{background:var(--gold);color:#fff}.dot.n{background:var(--no);color:#fff}.dot.m{background:var(--core-soft);color:var(--core)}.dot.e{background:var(--line);color:var(--muted)}
+.tag{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:700;font-size:13px;white-space:nowrap}
+.tag.pass{background:var(--gold);color:#fff}.tag.hobby{background:var(--no);color:#fff}.tag.wait{background:var(--core-soft);color:var(--core)}.tag.e{color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;align-items:center}
+.btn{font-weight:700;font-size:15px;padding:12px 20px;border-radius:999px;border:2px solid var(--core);cursor:pointer}
+.btn.primary{background:var(--core);color:#fff}
+.btn.ghost{background:transparent;color:var(--core)}
+.toast{font-size:14px;font-weight:700;color:var(--core)}
+.confirm{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px;margin-top:10px}
+#copyFallback{width:100%;min-height:140px;margin-top:12px;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px;background-image:none}
+footer{padding-block:28px 40px;font-size:12px;color:var(--muted);text-align:center}
+
+@media (max-width:640px){
+  .hero{padding-block:32px 12px}
+  .hero-grid{grid-template-columns:1fr}
+  .sieve{max-width:160px;order:-1}
+  .contrast{grid-template-columns:1fr}
+  .verdict{grid-template-columns:1fr;justify-items:start}
+  .qbadge{width:50px;height:50px;font-size:19px}
+  .tabs .hint{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">実践ノウハウ② ワークシート</p>
+      <h1>痛みの深度で<em>需要をふるいに掛ける</em>3つの質問</h1>
+      <div class="lead">
+        <p>前章の「3つの円」で見つけた候補は、磨けば光る原石のようなもの。それが「本当に読者がお金を払ってでも欲しい宝物」になるよう、マーケティングの視点で優しく磨き上げていきましょう。</p>
+        <p>候補ジャンルを入れて、3つの質問にそっと答えていってくださいね。</p>
+      </div>
+    </div>
+    <svg class="sieve" viewBox="0 0 200 200" role="img" aria-label="3段のふるいで、本当の需要だけが残る図">
+      <rect x="20" y="20" width="160" height="22" rx="11" fill="var(--night)" opacity=".85"/>
+      <text x="100" y="35" text-anchor="middle" fill="#fff">深夜の検索</text>
+      <rect x="36" y="64" width="128" height="22" rx="11" fill="var(--river)" opacity=".85"/>
+      <text x="100" y="79" text-anchor="middle" fill="#fff">お金の川</text>
+      <rect x="52" y="108" width="96" height="22" rx="11" fill="var(--heart)" opacity=".85"/>
+      <text x="100" y="123" text-anchor="middle" fill="#fff">共感</text>
+      <circle cx="100" cy="166" r="18" fill="var(--gold)"/>
+      <text x="100" y="170" text-anchor="middle" fill="#fff">宝物</text>
+      <g fill="var(--muted)" opacity=".5"><circle cx="60" cy="53" r="3"/><circle cx="140" cy="53" r="3"/><circle cx="100" cy="53" r="3"/><circle cx="72" cy="97" r="3"/><circle cx="128" cy="97" r="3"/><circle cx="100" cy="141" r="3"/></g>
+    </svg>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="候補ジャンル">
+  <div class="wrap" role="tablist" id="tabs"></div>
+</nav>
+
+<main>
+  <section class="cand">
+    <div class="wrap">
+      <label for="f-name" id="nameLabel">候補ジャンル</label>
+      <input id="f-name" type="text" placeholder="例：50代女性の、好きな人とのLINEの悩み">
+      <div class="import" id="importBox" hidden>
+        <span>「3つの円」で書いたスウィートスポットがあります。</span>
+        <button class="linkbtn" type="button" id="importBtn">読み込む</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="q" data-q="0">
+    <div class="wrap">
+      <div class="q-head">
+        <div class="qbadge">1</div>
+        <div>
+          <p class="qno">QUESTION 1 ・ 深夜の検索</p>
+          <h2>その悩みは「深夜、部屋で一人になった時に検索してしまうもの」か？</h2>
+        </div>
+      </div>
+      <details class="why">
+        <summary>この質問の意味を読む</summary>
+        <div class="body">
+          <p>人間が本当にお金を払う悩みとは、日中のカフェで友人と笑いながら話せるような表面的な「建前」ではありません。</p>
+          <p>真の需要は、夜、部屋の明かりを消してベッドに入り、強い不安や焦燥感に駆られながら、誰にも見せられないようなドロドロとした検索ワードをスマホに打ち込む「深い孤独と本音」の中に潜んでいます。</p>
+          <div class="contrast">
+            <div class="day"><b>日中の検索（建前）</b>上司とのコミュニケーション術</div>
+            <div class="night"><b>深夜の検索（本音）</b>パワハラ 限界 診断<br>会社 辞めたい 逃げ方</div>
+          </div>
+        </div>
+      </details>
+      <div class="memo">
+        <label for="m0">読者が深夜に打ち込みそうな検索ワードを書き出してみましょう</label>
+        <textarea id="m0" data-m="0" placeholder="例：彼 LINE 既読無視 2日&#10;50代 恋愛 気持ち悪い と思われる"></textarea>
+      </div>
+      <div class="answer">
+        <p>誰にも言えない本音として、深夜にすがりつくほどの痛みがありますか？</p>
+        <div class="yn" data-q="0"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="q" data-q="1">
+    <div class="wrap">
+      <div class="q-head">
+        <div class="qbadge">2</div>
+        <div>
+          <p class="qno">QUESTION 2 ・ お金の川</p>
+          <h2>ターゲットには「過去にすでに、お金を払って解決しようとした歴史」があるか？</h2>
+        </div>
+      </div>
+      <details class="why">
+        <summary>この質問の意味を読む</summary>
+        <div class="body">
+          <p>多くの初心者が「競合が誰もいないブルーオーシャンを見つけました！」と喜んで参入し、誰にも買われずに散っていきます。</p>
+          <p>「ライバルがいない場所」はブルーオーシャンなどではなく、単に「誰もお金を払わない枯れ果てた砂漠」です。</p>
+          <p>すでに「莫大なお金が流れている川」を見つけ、そこにあなたの網を仕掛ける必要があるのです。</p>
+        </div>
+      </details>
+      <div class="memo">
+        <label for="m1">そのジャンルにすでにある商品は？（見つけたものをタップ）</label>
+        <div class="chips" id="chips"></div>
+        <textarea id="m1" data-m="1" placeholder="見つけた商品名や値段をメモしておきましょう&#10;例：Amazonで恋愛本がランキング上位に5冊、有料note 980円〜"></textarea>
+      </div>
+      <div class="answer">
+        <p>すでにお金を払って解決しようと行動している人がいますか？</p>
+        <div class="yn" data-q="1"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="q" data-q="2">
+    <div class="wrap">
+      <div class="q-head">
+        <div class="qbadge">3</div>
+        <div>
+          <p class="qno">QUESTION 3 ・ 共感</p>
+          <h2>単なる知識（ノウハウ）ではなく「共感・感情の共有」が求められる領域か？</h2>
+        </div>
+      </div>
+      <details class="why">
+        <summary>この質問の意味を読む</summary>
+        <div class="body">
+          <p>2026年現在、AIが普及したことで、「正しい知識ややり方」の価値は完全にゼロ（無料）に暴落しました。</p>
+          <p>読者が求めているのは「自分と同じ絶望を味わい、同じ痛みを経験した人間の、血の通ったリアルな生還ストーリー」です。</p>
+          <p>AIには「挫折して夜通し泣いた経験」も「泥臭く失敗した経験」もありません。</p>
+        </div>
+      </details>
+      <div class="memo">
+        <label for="m2">このジャンルで語れる、あなたのリアルな生還ストーリーは？</label>
+        <textarea id="m2" data-m="2" placeholder="例：離婚後、50歳で好きな人ができて、LINEの返信を待って眠れない夜を何度も過ごしたけど、そこから関係を育てられた"></textarea>
+      </div>
+      <div class="answer">
+        <p>あなたの実体験が、そのまま読者への共感と救いになるジャンルですか？</p>
+        <div class="yn" data-q="2"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="verdict" id="verdict" aria-live="polite">
+      <div class="mark" id="vMark">？</div>
+      <div><h3 id="vTitle">3つの質問に答えると、判定が出ます</h3><p id="vText">「イエス」「迷う」「ノー」から選んでくださいね。</p></div>
+    </div>
+  </div>
+
+  <section class="final" id="judge">
+    <div class="wrap">
+      <p class="eyebrow">コンサルの最終ジャッジ</p>
+      <h2>候補ジャンルの判定一覧</h2>
+      <div class="judge">
+        <p>この3つの質問すべてに、<strong>自信を持って「イエス」と答えられないもの</strong>は、どれほどあなたが情熱を持っていてもビジネスジャンルから外してください。それは「趣味」として無料で楽しむべき領域です。</p>
+        <p>確実に稼ぐためには、ここで自分の感情を一度切り離し、冷徹な目で市場をジャッジする「プロの割り切り」が絶対に不可欠なのです。</p>
+      </div>
+      <div class="tablebox">
+        <table>
+          <thead><tr><th>候補ジャンル</th><th>深夜の検索</th><th>お金の川</th><th>共感</th><th>判定</th></tr></thead>
+          <tbody id="sumBody"></tbody>
+        </table>
+      </div>
+      <div class="actions">
+        <button class="btn primary" type="button" id="copyBtn">結果をまとめてコピー</button>
+        <button class="btn ghost" type="button" id="resetBtn">書き直す</button>
+        <span class="toast" id="toast" role="status"></span>
+      </div>
+      <div class="confirm" id="confirmBox" hidden>
+        <span>3つの候補の内容をすべて消しますか？</span>
+        <button class="btn primary" type="button" id="confirmYes">消す</button>
+        <button class="btn ghost" type="button" id="confirmNo">やめる</button>
+      </div>
+      <textarea id="copyFallback" readonly hidden aria-label="コピー用テキスト"></textarea>
+    </div>
+  </section>
+</main>
+
+<footer>痛みの深度（Pains &amp; Gains）で需要をふるいに掛ける3つの質問</footer>
+
+<script>
+(function(){
+  const KEY='pains-gains-sieve-v1', PREV='three-circles-work-v1';
+  const LETTERS=['A','B','C'];
+  const QN=['深夜の検索','お金の川','共感'];
+  const CHIPS=['本','高額セミナー','カウンセリング','有料note','講座・スクール','占い・鑑定'];
+  const blank=()=>({name:'',a:[null,null,null],m:['','',''],chips:[]});
+  let st;
+  try{st=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){st=null}
+  if(!st||!Array.isArray(st.c)||st.c.length!==3)st={active:0,c:[blank(),blank(),blank()]};
+  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+  const cur=()=>st.c[st.active];
+
+  // yes/no buttons
+  document.querySelectorAll('.yn').forEach(g=>{
+    g.innerHTML='<button type="button" data-v="y" aria-pressed="false">イエス<small>自信を持って言える</small></button>'+
+      '<button type="button" data-v="m" aria-pressed="false">迷う<small>もう少し調べたい</small></button>'+
+      '<button type="button" data-v="n" aria-pressed="false">ノー<small>当てはまらない</small></button>';
+    g.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+      const q=+g.dataset.q;const c=cur();c.a[q]=c.a[q]===b.dataset.v?null:b.dataset.v;save();render()});
+  });
+  const chipBox=document.getElementById('chips');
+  chipBox.innerHTML=CHIPS.map(t=>'<button type="button" class="chip" data-c="'+t+'" aria-pressed="false">'+t+'</button>').join('');
+  chipBox.addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;
+    const c=cur(),i=c.chips.indexOf(b.dataset.c);i<0?c.chips.push(b.dataset.c):c.chips.splice(i,1);save();render()});
+
+  const nameEl=document.getElementById('f-name');
+  nameEl.addEventListener('input',()=>{cur().name=nameEl.value;save();renderTabs();renderSummary()});
+  document.querySelectorAll('textarea[data-m]').forEach(t=>t.addEventListener('input',()=>{cur().m[+t.dataset.m]=t.value;save()}));
+
+  function judge(c){
+    if(c.a.some(v=>v==='n'))return 'hobby';
+    if(c.a.every(v=>v==='y'))return 'pass';
+    if(c.a.every(v=>v===null))return 'e';
+    return 'wait';
+  }
+  const JL={pass:'ビジネスにする',hobby:'趣味で楽しむ',wait:'調べ直し',e:'未回答'};
+  const label=(c,i)=>c.name.trim()||('候補'+LETTERS[i]);
+
+  function renderTabs(){
+    const box=document.getElementById('tabs');
+    box.innerHTML=st.c.map((c,i)=>'<button class="tab" role="tab" type="button" data-i="'+i+'" aria-selected="'+(i===st.active)+'"><span class="nm"></span><span class="marks">'+
+      c.a.map(v=>'<i class="'+(v||'')+'"></i>').join('')+'</span></button>').join('')+'<span class="hint">候補は3つまで比べられます</span>';
+    box.querySelectorAll('.tab').forEach(b=>{b.querySelector('.nm').textContent=label(st.c[+b.dataset.i],+b.dataset.i)});
+  }
+  document.getElementById('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;st.active=+b.dataset.i;save();render();
+    document.querySelector('.cand').scrollIntoView({behavior:'smooth',block:'start'})});
+
+  function renderVerdict(){
+    const c=cur(),j=judge(c),v=document.getElementById('verdict');
+    v.className='verdict '+(j==='e'?'':j);
+    const T=document.getElementById('vTitle'),X=document.getElementById('vText'),M=document.getElementById('vMark');
+    if(j==='pass'){M.textContent='合格';T.textContent='ビジネスジャンルとして進めましょう';X.textContent='3つすべてに自信を持って「イエス」と言えました。あなたの努力が「ありがとう」と収益に結びつく市場です。'}
+    else if(j==='hobby'){const f=c.a.map((x,i)=>x==='n'?QN[i]:null).filter(Boolean).join('・');
+      M.textContent='趣味';T.textContent='これは「趣味」として無料で楽しむ領域です';X.textContent='「'+f+'」が当てはまりませんでした。情熱があっても、ここはプロの割り切りで外しましょう。'}
+    else if(j==='wait'){M.textContent='保留';T.textContent='自信を持ってイエスと言えるまで、調べ直しましょう';X.textContent='まだ答えていない質問や「迷う」がある状態です。深夜の検索ワードや既存の商品を、もう一度調べてみてくださいね。'}
+    else{M.textContent='？';T.textContent='3つの質問に答えると、判定が出ます';X.textContent='「イエス」「迷う」「ノー」から選んでくださいね。'}
+  }
+  function renderSummary(){
+    const tb=document.getElementById('sumBody');tb.innerHTML='';
+    st.c.forEach((c,i)=>{const tr=document.createElement('tr');const td=document.createElement('td');td.textContent=label(c,i);tr.appendChild(td);
+      c.a.forEach(v=>{const d=document.createElement('td');d.innerHTML='<span class="dot '+(v||'e')+'">'+({y:'○',n:'×',m:'△'}[v]||'－')+'</span>';tr.appendChild(d)});
+      const j=judge(c),d=document.createElement('td');d.innerHTML='<span class="tag '+j+'">'+JL[j]+'</span>';tr.appendChild(d);tb.appendChild(tr)});
+  }
+  function render(){
+    const c=cur();
+    nameEl.value=c.name;
+    document.getElementById('nameLabel').textContent='候補'+LETTERS[st.active]+'のジャンル';
+    document.querySelectorAll('textarea[data-m]').forEach(t=>t.value=c.m[+t.dataset.m]);
+    document.querySelectorAll('.yn').forEach(g=>{const q=+g.dataset.q;g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',c.a[q]===b.dataset.v?'true':'false'))});
+    chipBox.querySelectorAll('.chip').forEach(b=>b.setAttribute('aria-pressed',c.chips.includes(b.dataset.c)?'true':'false'));
+    renderTabs();renderVerdict();renderSummary();
+  }
+
+  // 3つの円の続きとして、同じサイトで書いたスウィートスポットを読み込む
+  let prevCore='';
+  try{const p=JSON.parse(localStorage.getItem(PREV)||'{}');prevCore=(p&&typeof p.core==='string')?p.core.trim():''}catch(e){}
+  if(prevCore){document.getElementById('importBox').hidden=false}
+  document.getElementById('importBtn').addEventListener('click',()=>{cur().name=prevCore.split('\n')[0].slice(0,80);save();render();say('スウィートスポットを読み込みました')});
+
+  const toast=document.getElementById('toast');
+  function say(m){toast.textContent=m;clearTimeout(say.t);say.t=setTimeout(()=>toast.textContent='',3000)}
+  function compose(){
+    const L=['【需要のふるいワーク】',''];
+    st.c.forEach((c,i)=>{if(!c.name.trim()&&c.a.every(v=>v===null)&&c.m.every(m=>!m.trim()))return;
+      L.push('■ '+label(c,i)+'　→ 判定：'+JL[judge(c)]);
+      c.a.forEach((v,q)=>{L.push('・'+QN[q]+'：'+({y:'イエス',m:'迷う',n:'ノー'}[v]||'未回答'));
+        if(q===1&&c.chips.length)L.push('　既存の商品：'+c.chips.join('、'));
+        if(c.m[q].trim())L.push('　'+c.m[q].trim().replace(/\n/g,'\n　'))});
+      L.push('')});
+    return L.join('\n').trim();
+  }
+  document.getElementById('copyBtn').addEventListener('click',()=>{
+    const text=compose(),fb=document.getElementById('copyFallback');
+    const fallback=()=>{fb.value=text;fb.hidden=false;fb.focus();fb.select();say('下の欄を長押し（または選択）してコピーしてください')};
+    try{navigator.clipboard.writeText(text).then(()=>{fb.hidden=true;say('コピーしました。メモ帳やLINEに貼って保存しましょう')}).catch(fallback)}catch(e){fallback()}
+  });
+  const box=document.getElementById('confirmBox');
+  document.getElementById('resetBtn').addEventListener('click',()=>{box.hidden=false});
+  document.getElementById('confirmNo').addEventListener('click',()=>{box.hidden=true});
+  document.getElementById('confirmYes').addEventListener('click',()=>{st={active:0,c:[blank(),blank(),blank()]};try{localStorage.removeItem(KEY)}catch(e){}box.hidden=true;render();say('まっさらに戻しました')});
+  render();
+})();
+</script>
+
+</body>
+</html>
